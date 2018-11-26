@@ -13,7 +13,7 @@
         $animal_name = (empty($_REQUEST['animal_name']) ? '' : $_REQUEST['animal_name']);
 
         $connection = require_once('db.php');
-        //query is wrong
+
         $query_str = "SELECT animal.name, animal.species_name, animal.age FROM animal, client WHERE client.VAT in (SELECT VAT FROM person WHERE person.name LIKE :client_name) and animal.VAT = client.VAT and animal.name = :animal_name";
         $stmt = $connection->prepare($query_str);
 
