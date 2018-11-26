@@ -34,7 +34,7 @@
             echo("<thead><tr><th>Name</th><th>Species Name</th><th>Age</th></tr></thead>");
             
             foreach($stmt as $animal) {
-                echo("<tr><td>".$animal['name'].'</td><td>'.$animal['species_name'].'</td><td>'.$animal['age']."</td></tr>");
+                echo("<tr><td><a href='consult_details.php?animal_name=".$animal['name']."'>".$animal['name'].'</td><td>'.$animal['species_name'].'</td><td>'.$animal['age']."</td></tr>");
             }
             
             echo("</table>");
