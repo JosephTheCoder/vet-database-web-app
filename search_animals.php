@@ -31,7 +31,7 @@
 
         if ($stmt->rowCount() > 0 ) {
             echo('<table border="1" cellpadding="5">');
-            echo("<thead><tr><th>Client</th><th>Animal</th><th>Species Name</th><th>Age</th></tr></thead>");
+            echo("<thead><tr><th>Client</th><th>Animal</th><th>Species</th><th>Age</th></tr></thead>");
             
             foreach($stmt as $animal) {
                 echo("<tr><td>".$animal['person_name']."</td><td>"."<a href='consult_details.php?animal_name=".$animal['animal_name']."'>".$animal['animal_name'].'</td><td>'.$animal['species_name'].'</td><td>'.$animal['age']."</td></tr>");
