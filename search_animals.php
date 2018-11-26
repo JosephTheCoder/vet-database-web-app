@@ -17,8 +17,10 @@
         $query_str = "SELECT animal.name, animal.species_name, animal.age FROM animal, client WHERE client.VAT in (SELECT VAT FROM person WHERE person.name LIKE :client_name) and animal.VAT = client.VAT and animal.name = :animal_name";
         $stmt = $connection->prepare($query_str);
 
-        $stmt->bindParam(':client_name', '%'.$client_name.'%');
-        $stmt->bindParam(':animal_name', '%'.$animal_name.'%');
+        $clnt_name = '%'.$client_name.'%';
+
+        $stmt->bindParam(':client_name', $clnt_name);
+        $stmt->bindParam(':animal_name', $animal_name);
         
         echo("<h4>Results for: $client_name </h4>");
 
@@ -32,7 +34,7 @@
             echo("<thead><tr><th>Name</th><th>Species Name</th><th>Age</th></tr></thead>");
             
             foreach($stmt as $animal) {
-                echo("<tr><td>".$animal['name'].$animal['species_name'].$animal['age']."</td></tr>");
+                echo("<tr><td>".$animal['name'].'</td><td>'.$animal['species_name'].'</td><td>'.$animal['age']."</td></tr>");
             }
             
             echo("</table>");
