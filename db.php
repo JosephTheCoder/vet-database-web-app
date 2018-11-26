@@ -1,7 +1,7 @@
 <?php
-    $hostname = 'db.tecnico.ulisboa.pt'
-    $username= 'ist181570'
-    $password = 'eeua4108'
+    $hostname = "db.tecnico.ulisboa.pt";
+    $username= "ist181570";
+    $password = "eeua4108";
 
     $dsn = "mysql:host=$hostname;dbname=$username";
 
@@ -11,3 +11,4 @@
         echo("<p>ERROR: " . $e->getMessage() . "</p>");
         exit();
     }
+?>
