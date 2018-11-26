@@ -22,7 +22,15 @@
         $stmt->bindParam(':client_name', $clnt_name);
         $stmt->bindParam(':animal_name', $animal_name);
 
-        echo("<h4>Results for: $client_name </h4>");
+        if ($client_vat != '') {
+            echo("<h4>Client VAT: $client_vat</h4>");
+        }
+        
+        if ($client_name != '') {
+            echo("<h4>Client name: $client_name</h4>");
+        }
+        
+        echo("<h4>Animal name: $animal_name</h4>");
 
         if ( !$stmt->execute() ) {
             echo("<p>An error occurred!</p>");
