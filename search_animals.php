@@ -40,7 +40,7 @@
             echo("</table>");
         } else {
             echo("<p>No animal was found!</p>");
-            // include('new_animal.php');
+            include('new_animal.php');
         }
 
         $stmt->close();
