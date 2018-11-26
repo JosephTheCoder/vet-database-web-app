@@ -13,15 +13,16 @@
         $animal_name = (empty($_REQUEST['animal_name']) ? '' : $_REQUEST['animal_name']);
 
         $connection = require_once('db.php');
-
-        $query_str = "SELECT animal.name, animal.species_name, animal.age FROM animal, client WHERE client.VAT in (SELECT VAT FROM person WHERE person.name LIKE :client_name) and animal.VAT = client.VAT and animal.name = :animal_name";
+        $query_str = "SELECT DISTINCT animal.name, animal.species_name, animal.age FROM person, client, animal, consult WHERE (animal.name = :animal_name AND person.name LIKE :client_name AND person.VAT = client.VAT AND client.VAT = animal.VAT AND consult.VAT_owner = client.VAT AND consult.name = animal.name) OR (animal.name = :animal_name AND client.VAT = :client_vat AND client.VAT = consult.VAT_client AND consult.name = animal.name AND person.VAT = consult.VAT_owner)";
+        // $query_str = "SELECT animal.name, animal.species_name, animal.age FROM animal, client WHERE client.VAT in (SELECT VAT FROM person WHERE person.name LIKE :client_name) and animal.VAT = client.VAT and animal.name = :animal_name";
         $stmt = $connection->prepare($query_str);
 
         $clnt_name = '%'.$client_name.'%';
 
+        $stmt->bindParam(':client_vat', $client_vat);
         $stmt->bindParam(':client_name', $clnt_name);
         $stmt->bindParam(':animal_name', $animal_name);
-        
+
         echo("<h4>Results for: $client_name </h4>");
 
         if ( !$stmt->execute() ) {
