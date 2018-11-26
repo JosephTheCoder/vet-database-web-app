@@ -11,8 +11,8 @@
     </head>
 
     <body>
-        <h1>Healthcare Center</h1>
-        <h2>Search patient by name</h2>
+        <h1>Veterinary Clinit</h1>
+        <h2>Search clients by name</h2>
         
         <form action="search_animals.php" method="post">
             <p>Client VAT: <input type="text" name="client_vat"></p>
