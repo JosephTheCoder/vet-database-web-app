@@ -1,44 +1,63 @@
+<?php
+    // We start a session in order to safe the search parameters.
+    session_start();
+?>
+
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Consults of </title>
+        <title>Consult Details</title>
     </head>
 
-    <body>
-        <h2>Search results</h2>
-        
+    <body>        
         <?php        
-        $client_vat = (empty($_REQUEST['client_vat']) ? '' : $_REQUEST['client_vat']);
-        $client_name = (empty($_REQUEST['client_name']) ? '' : $_REQUEST['client_name']);
-        $animal_name = (empty($_REQUEST['animal_name']) ? '' : $_REQUEST['animal_name']);
+            if (empty($_GET['date']) || empty($_SESSION['animal_name'])) {
+                // Invalid request
+                echo("<p><b>Invalid Search parameters.</b></p><p>Please include date and animal names.</p>");
+            } else { 
+                // Process and cleaning :)
+                $date_timestamp = strip_tags($_GET['date'],"<b><i><a><p>");
+                $date_timestamp = htmlspecialchars($date_timestamp);
 
-        $connection = require_once('db.php');
+                // Database access
+                $connection = require_once('db.php'); //TODO query
+                $query_str = "SELECT animal.gender, animal.age, consult.weight, consult.s, consult.o, consult.a, consult.p FROM consult, animal WHERE animal.name = :animal_name AND consult.date_timestamp = :date_timestamp";
+                $stmt = $connection->prepare($query_str);
 
-        $query_str = "SELECT animal.name, animal.species_name, animal.age FROM animal, client WHERE client.VAT in (SELECT VAT FROM person WHERE person.name LIKE %:clnt_name%) and animal.VAT = client.VAT and animal.name = :anml.name";
+                $stmt->bindParam(':date_timestamp', $date_timestamp);
+                $stmt->bindParam(':animal_name', $_SESSION['animal_name']);
 
-        $stmt = $connection->prepare();
-        echo("<h4>Results for: $client_name </h4>");
-        $client_name = '%'.$client_name.'%';
-        $stmt->bindParam(':clnt_name', $client_name);
-        $stmt->bindParam(':anml_name', $animal_name);
+                if ( !$stmt->execute() ) {
+                    echo("<p>An error occurred!</p>");
+                    exit();
+                }
+                
+                echo("<p>-------------------------------------------------------------------</p>");
+                echo("<p><h2>$animal_name Consult Details</h2><p>");
+                echo("<p><h4>Date: $date_timestamp</h4><p>");
+                echo("<p>-------------------------------------------------------------------</p>");
 
-        if ( !$stmt->execute() ) {
-            echo("<p>An error occurred!</p>");
-            exit();
-        }
+                echo("<h4>Characteristics of the animal:</h4>");
 
-        if ($stmt->rowCount() > 0 ) {
-            echo("<table border=1 cellpadding='5'>");
-            echo("<thead><tr><th>Name</th><th>Species Name</th><th>Age</th></tr></thead>");
-            foreach($stmt as $animal) {
-                echo("<tr><td><a href='consult_details.php?pat_id=".$animal['name']."'>".$animal['species_name'].$animal['age']"</a></td></tr>");
+                if ($stmt->rowCount() > 0 ) {
+
+                    $result = $stmt->fetch();
+                    echo("<p><b>Gender:</b> ".$result['gender']."</p>");
+                    echo("<p><b>Age:</b> ".$result['age']."</p>");
+                    echo("<p><b>Weight:</b> ".$result['weight']."</p>");
+                    
+                    echo("<p><b>Subjective observation:</b> ".$result['s']."</p>");
+                    echo("<p><b>Objective observation:</b> ".$result['o']."</p>");
+                    echo("<p><b>Assessment:</b> ".$result['a']."</p>");
+                    echo("<p><b>Plan:</b> ".$result['p']."</p>");
+
+                    echo("</table>");
+                } else {
+                    echo("<p>$animal_name hasn't had any consults in the clinic.</p>");
+                }
+
+                $connection = NULL;
             }
-            echo("</table>");
-        } else {
-            echo("<p>No animal was found!</p>");
-            include('new_animal.php');
-        }
-        $connection = NULL;
         ?>
     </body>
 </html>

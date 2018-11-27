@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Adding a new animal</title>
+        <title>Adding a new consult</title>
     </head>
     <body>
         <h2>Adding a new animal</h2>
