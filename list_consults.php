@@ -59,6 +59,7 @@
 
                 include('new_consult.php');
 
+                $stmt->close();
                 $connection = NULL;
             }
         ?>

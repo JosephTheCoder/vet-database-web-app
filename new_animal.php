@@ -17,8 +17,8 @@
                     <td><input type="TEXT" name="animal_species"></td>
                 </tr>
                 <tr>
-                    <td align='right'>Color:</td>
-                    <td><input type="text" name="animal_color"></td>
+                    <td align='right'>Colour:</td>
+                    <td><input type="text" name="animal_colour"></td>
                 </tr>
                 <tr>
                     <td align='right'>Gender:</td>
@@ -29,7 +29,7 @@
                     <td><input type="date" name="animal_birth"></td>
                 </tr>
             </table>
-            <p><input type="submit" value="Submit"></p>
+            <p><input type="submit" value="Add animal"></p>
         </form>
     </body>
 </html>
