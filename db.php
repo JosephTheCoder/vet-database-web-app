@@ -1,4 +1,5 @@
 <?php
+    // muda-se para a db que quiserem.
     $hostname = "db.tecnico.ulisboa.pt";
     $username= "ist425422";
     $password = "ehhn4994";
