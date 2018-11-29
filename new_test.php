@@ -25,6 +25,7 @@
                     <td align='right'>Creatine level (kg):</td>
                     <td><input type="number" name="cl_result"></td>
                 </tr>
+                <!-- insert more blood test params here -->
             </table>
             <p><input type="submit" value="Add blood test"></p>
         </form>
