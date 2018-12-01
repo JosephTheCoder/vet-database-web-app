@@ -20,20 +20,25 @@
                 $ass_vat = strip_tags($_REQUEST['ass_vat'],"<b><i><a><p>");
                 $ass_vat = htmlspecialchars($ass_vat);
 
+                echo("0"); // debug
+
                 // Database access
                 $connection = require_once('db.php');
 
                 // find the owner vat
-                $search_vat = "SELECT client.VAT FROM person, client WHERE person.name = client.name AND person.name = :clnt_name";
+                $search_vat = "SELECT animal.VAT FROM person, client, animal WHERE person.VAT = client.VAT AND person.name LIKE :clnt_name AND client.VAT = animal.VAT AND animal.name = :anmal_name";
                 $finder = $connection->prepare($search_vat);
-                $finder->bindParam(':clnt_name', $_SESSION['client_name']);
+                $cntlikename = '%'.$_SESSION['client_name'].'%';
+                $finder->bindParam(':clnt_name', $cntlikename);
+                $finder2->bindParam(':anmal_name', $_SESSION['animal_name']);
                 if ( !$finder->execute() ) {
                     echo("<p>An error occurred! finder</p>");
                     exit();
                 }
                 $result = $finder->fetch();
                 $owner_vat = $result['VAT'];
-                $finder->close();
+
+                echo("1"); // debug
                 
                 // which num is the procedure
                 $search_num = "SELECT MAX(num) as nr FROM `procedure` WHERE name = :anmal_name AND VAT_owner = :ownvat ";
@@ -46,7 +51,8 @@
                 }
                 $result = $finder->fetch();
                 $num = $result['nr'] + 1; // can i do this?
-                $finder2->close();
+
+                echo("2");
                 
                 // create a procedure!! (& test procedure)
                 $insert_pro = "INSERT INTO `procedure` VALUES (:anmal_name, :ownvat, :datestamp, :num, 'blood test')";
@@ -59,7 +65,6 @@
                     echo("<p>An error occurred! The procedure was not added!</p>");
                     exit();
                 }
-                $inspro->close();
                 
                 $insert_tp = "INSERT INTO test_procedure VALUES (:anmal_name, :ownvat, :datestamp, :num, 'blood')";
                 $instp = $connection->prepare($insert_tp);
@@ -71,7 +76,6 @@
                     echo("<p>An error occurred! The test procedure was not added!</p>");
                     exit();
                 }
-                $instp->close();
                 
                 // preformed by                
                 $insert_pre = "INSERT INTO `procedure` VALUES (:anmal_name, :ownvat, :datestamp, :num, :assvat)";
@@ -85,7 +89,6 @@
                     echo("<p>An error occurred! The preformed was not added!</p>");
                     exit();
                 }
-                $inspre->close();
                 
                 // insert into produced indicator query
                 if(!empty($_REQUEST['glic_result'])){
@@ -105,15 +108,14 @@
                     if ( !$stmt->execute() ) {
                         echo("<p>An error occurred! The test was not added!</p>");
                         exit();
-                    }
-                    $stmt->close();                
+                    }              
                 }
                 
                 // MISSING a query for each other produced indicator
               
                 echo("<p>SUCCESS: Test added successfully!</p>");                    
                 
-                $connection = NULL;
+                mysql_close($connection);
             }
         ?>
     </body>

@@ -16,9 +16,9 @@
                 echo("<p><b>Invalid Search parameters.</b></p><p>Please include client and animal names.</p>");
             } else { 
                 // Process and cleaning :)
-                $client_name = strip_tags($_GET['client'],"<b><i><a><p>");
-                $client_name = htmlspecialchars($client_name);
-                $_SESSION['client_name'] = $client_name;
+                $animal_vat = strip_tags($_GET['client'],"<b><i><a><p>");
+                $animal_vat = htmlspecialchars($animal_vat);
+                $_SESSION['animal_vat'] = $animal_vat;
 
                 $animal_name = strip_tags($_GET['animal'],"<b><i><a><p>");
                 $animal_name = htmlspecialchars($animal_name);
@@ -26,10 +26,11 @@
 
                 // Database access
                 $connection = require_once('db.php'); //TODO query
-                $query_str = "SELECT consult.date_timestamp, consult.VAT_client, consult.VAT_vet FROM consult WHERE consult.name = :animal_name";
+                $query_str = "SELECT consult.date_timestamp, consult.VAT_client, consult.VAT_vet FROM consult WHERE consult.name = :animal_name AND consult.VAT_owner = :animal_vat";
                 $stmt = $connection->prepare($query_str);
 
                 $stmt->bindParam(':animal_name', $animal_name);
+                $stmt->bindParam(':animal_vat', $animal_vat);
 
                 if ( !$stmt->execute() ) {
                     echo("<p>An error occurred!</p>");
@@ -48,16 +49,13 @@
 
                     foreach($stmt as $query) {
                         echo("<tr><td><a href='consult_details.php?date=".$query['date_timestamp']."'>".$query['date_timestamp']."</a>
-                        </td><td>".$query['VAT_client']."</td><td>".$query['VAT_vet']."</td><td><form action='new_test.php' method='get'>
-                        <input type='submit' value='New test'/></form></td></tr>");
+                        </td><td>".$query['VAT_client']."</td><td>".$query['VAT_vet']."</td><td><a href='new_test.php?date=".$query['date_timestamp']."'> New test </a></td></tr>");
                     }
 
                     echo("</table>");
                 } else {
                     echo("<p>$animal_name hasn't had any consults in the clinic.</p>");
                 }
-
-                include('new_consult.php');
 
                 $stmt->close();
                 $connection = NULL;

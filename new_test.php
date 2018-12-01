@@ -6,12 +6,18 @@
 <!DOCTYPE html>
 <html>
     <body>
+        <?php 
+            $date = strip_tags($_GET['date'],"<b><i><a><p>");
+            $date = htmlspecialchars($date);
+            $_SESSION['date'] = $date;
+        ?>
+
         <h3>Add a new test</h3>
         <form action="insert_test.php" method="post">
             <table>
                 <tr>
                     <td align='right'>Assistant VAT:</td>
-                    <td><input type="number" name="ass_vat"></td>
+                    <td><input type="text" name="ass_vat"></td>
                 </tr>
                 <tr>
                     <td align='right'>Glicose (mg):</td>
