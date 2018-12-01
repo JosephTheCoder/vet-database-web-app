@@ -20,7 +20,7 @@
                 $animal_species = htmlspecialchars($animal_species);
 
                 $animal_colour = strip_tags($_REQUEST['animal_colour'],"<b><i><a><p>");
-                $animal_colour = htmlspecialchars($animal_color);
+                $animal_colour = htmlspecialchars($animal_colour);
 
                 $animal_gender = strip_tags($_REQUEST['animal_gender'],"<b><i><a><p>");
                 $animal_gender = htmlspecialchars($animal_gender);
@@ -55,7 +55,7 @@
                 echo("<tr><td align='right'>Name:</td><td>$animal_name</td></tr>");
                 echo("<tr><td align='right'>Client VAT:</td><td>$animal_vat</td></tr>");
                 echo("<tr><td align='right'>Species:</td><td>$animal_species</td></tr>");
-                echo("<tr><td align='right'>Color:</td><td>$animal_colour</td></tr>");
+                echo("<tr><td align='right'>Colour:</td><td>$animal_colour</td></tr>");
                 echo("<tr><td align='right'>Gender:</td><td>$animal_gender</td></tr>");
                 echo("<tr><td align='right'>Birth-date:</td><td>$animal_birth</td></tr>");
                 echo("</table>");                    
