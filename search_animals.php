@@ -32,7 +32,7 @@
     
                 // Database access
                 $connection = require_once('db.php');
-                $query_str = "SELECT DISTINCT person.name as person_name, animal.name as animal_name, animal.species_name, animal.age FROM person, client, animal, consult WHERE (animal.name = :animal_name AND person.name LIKE :client_name AND person.VAT = client.VAT AND client.VAT = animal.VAT AND consult.VAT_owner = client.VAT AND consult.name = animal.name) OR (animal.name = :animal_name AND client.VAT = :client_vat AND client.VAT = consult.VAT_client AND consult.name = animal.name AND person.VAT = consult.VAT_owner)";
+                $query_str = "SELECT DISTINCT person.name as person_name, animal.name as animal_name, animal.species_name, animal.age, animal.VAT as animal_vat FROM person, client, animal, consult WHERE (animal.name = :animal_name AND person.name LIKE :client_name AND person.VAT = client.VAT AND client.VAT = animal.VAT AND consult.VAT_owner = client.VAT AND consult.name = animal.name) OR (animal.name = :animal_name AND client.VAT = :client_vat AND client.VAT = consult.VAT_client AND consult.name = animal.name AND person.VAT = consult.VAT_owner)";
                 $stmt = $connection->prepare($query_str);
 
                 $clnt_name = '%'.$client_name.'%';
@@ -58,7 +58,7 @@
                     echo("<thead><tr><th>Client</th><th>Animal</th><th>Species</th><th>Age</th></tr></thead>");
                     
                     foreach($stmt as $query) {
-                        echo("<tr><td>".$query['person_name']."</td><td><a href='list_consults.php?client=".$query['person_name']."&animal=".$query['animal_name']."'>".$query['animal_name']."</a></td><td>".$query['species_name']."</td><td>".$query['age']."</td></tr>");
+                        echo("<tr><td>".$query['person_name']."</td><td><a href='list_consults.php?client=".$query['animal_vat']."&animal=".$query['animal_name']."'>".$query['animal_name']."</a></td><td>".$query['species_name']."</td><td>".$query['age']."</td><td><a href='new_consult.php?client=".$query['animal_vat']."&animal=".$query['animal_name']."'> New consult </a></td></tr>");
                     }
                     
                     echo("</table>");

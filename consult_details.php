@@ -11,7 +11,7 @@
 
     <body>
         <?php        
-            if (empty($_GET['date']) || empty($_SESSION['animal_name'] || empty($_SESSION['client_name']))) {
+            if (empty($_GET['date']) || empty($_SESSION['animal_name'] || empty($_SESSION['animal_vat']))) {
                 // Invalid request
                 echo("<p><b>Invalid Search parameters.</b></p><p>Please include date, animal and owner names.</p>");
             } else { 
@@ -22,13 +22,13 @@
 
                 // Database access
                 $connection = require_once('db.php'); // FALTA PASSAR O OWNER VAT PARA VERIFICAR NO FIM DA QUERY
-                $query_general_details = "SELECT  animal.gender, animal.age, consult.weight, animal.species_name, animal.colour, consult.VAT_owner, consult.s, consult.o, consult.a, consult.p FROM consult, animal, client, person WHERE consult.VAT_owner = animal.VAT AND consult.name = animal.name AND consult.date_timestamp = :date_timestamp AND consult.name = :animal_name AND consult.VAT_owner = client.VAT AND client.VAT = person.VAT AND person.name = :owner_name";
+                $query_general_details = "SELECT  animal.gender, animal.age, consult.weight, animal.species_name, animal.colour, consult.VAT_owner, consult.s, consult.o, consult.a, consult.p FROM consult, animal WHERE consult.VAT_owner = animal.VAT AND consult.name = animal.name AND consult.date_timestamp = :date_timestamp AND consult.name = :animal_name AND consult.VAT_owner = :animal_vat";
                 
                 $stmt = $connection->prepare($query_general_details);
                 
                 $stmt->bindParam(':date_timestamp', $date_timestamp);
                 $stmt->bindParam(':animal_name', $_SESSION['animal_name']);
-                $stmt->bindParam(':owner_name', $_SESSION['client_name']);
+                $stmt->bindParam(':animal_vat', $_SESSION['animal_vat']);
                 
                 if ( !$stmt->execute() ) {
                     echo("<p>An error occurred!</p>");
