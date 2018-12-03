@@ -1,5 +1,4 @@
 <?php
-    // We start a session in order to safe the search parameters.
     session_start();
 ?>
 
