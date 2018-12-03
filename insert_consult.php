@@ -45,7 +45,7 @@
                 $diagnostic_codes = strip_tags($_REQUEST['diagnostic_codes'],"<b><i><a><p>");
                 $diagnostic_codes = htmlspecialchars($diagnostic_codes);  
 
-                $date_timestamp = "NOW()";
+                $date_timestamp = date("Y-m-d H:i:s"); 
 
                 // Database access
                 $connection = require_once('db.php');
