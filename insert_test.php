@@ -12,38 +12,21 @@
     </head>
     <body>
         <?php
-            if ( empty($_SESSION['animal_name']) || empty($_SESSION['client_name']) || empty($_SESSION['date']) || empty($_REQUEST['ass_vat'])) {
+            if ( empty($_SESSION['animal_name']) || empty($_SESSION['animal_vat']) || empty($_SESSION['date']) || empty($_REQUEST['ass_vat'])) {
                 // Invalid request / user directly opened file.
                 echo("<p>ERROR: not enough info!</p>");
             } else {
                 // Request with all required parameters was made
                 $ass_vat = strip_tags($_REQUEST['ass_vat'],"<b><i><a><p>");
-                $ass_vat = htmlspecialchars($ass_vat);
-
-                echo("0"); // debug
+                $ass_vat = htmlspecialchars($ass_vat);       
 
                 // Database access
                 $connection = require_once('db.php');
 
-                // find the owner vat
-                $search_vat = "SELECT animal.VAT FROM person, client, animal WHERE person.VAT = client.VAT AND person.name LIKE :clnt_name AND client.VAT = animal.VAT AND animal.name = :anmal_name";
-                $finder = $connection->prepare($search_vat);
-                $cntlikename = '%'.$_SESSION['client_name'].'%';
-                $finder->bindParam(':clnt_name', $cntlikename);
-                $finder2->bindParam(':anmal_name', $_SESSION['animal_name']);
-                if ( !$finder->execute() ) {
-                    echo("<p>An error occurred! finder</p>");
-                    exit();
-                }
-                $result = $finder->fetch();
-                $owner_vat = $result['VAT'];
-
-                echo("1"); // debug
-                
                 // which num is the procedure
                 $search_num = "SELECT MAX(num) as nr FROM `procedure` WHERE name = :anmal_name AND VAT_owner = :ownvat ";
                 $finder2 = $connection->prepare($search_num);                
-                $finder2->bindParam(':ownvat', $owner_vat);
+                $finder2->bindParam(':ownvat', $_SESSION['animal_vat']);
                 $finder2->bindParam(':anmal_name', $_SESSION['animal_name']);
                 if ( !$finder2->execute() ) {
                     echo("<p>An error occurred! finder2</p>");
@@ -52,14 +35,14 @@
                 $result = $finder->fetch();
                 $num = $result['nr'] + 1; // can i do this?
 
-                echo("2");
+                echo("<p>Found procedure num</p>");
                 
                 // create a procedure!! (& test procedure)
                 $insert_pro = "INSERT INTO `procedure` VALUES (:anmal_name, :ownvat, :datestamp, :num, 'blood test')";
                 $inspro = $connection->prepare($insert_pro);
                 $inspro->bindParam(':anmal_name', $_SESSION['animal_name']);
                 $inspro->bindParam(':datestamp', $_SESSION['date']);
-                $inspro->bindParam(':ownvat', $owner_vat);
+                $inspro->bindParam(':ownvat', $_SESSION['animal_vat']);
                 $inspro->bindParam(':num', $num);
                 if ( !$inspro->execute() ) {
                     echo("<p>An error occurred! The procedure was not added!</p>");
@@ -82,7 +65,7 @@
                 $inspre = $connection->prepare($insert_pre);
                 $inspre->bindParam(':anmal_name', $_SESSION['animal_name']);
                 $inspre->bindParam(':datestamp', $_SESSION['date']);
-                $inspre->bindParam(':ownvat', $owner_vat);
+                $inspre->bindParam(':ownvat', $_SESSION['animal_vat']);
                 $inspre->bindParam(':num', $num);
                 $inspre->bindParam(':assvat', $ass_vat);
                 if ( !$inspre->execute() ) {
@@ -102,7 +85,7 @@
                     $stmt->bindParam(':anmal_name', $_SESSION['animal_name']);
                     $stmt->bindParam(':datestamp', $_SESSION['date']);
                     $stmt->bindParam(':value_gli', $glic_result);
-                    $stmt->bindParam(':ownvat', $owner_vat);
+                    $stmt->bindParam(':ownvat', $_SESSION['animal_vat']);
                     $stmt->bindParam(':num', $num);
 
                     if ( !$stmt->execute() ) {
@@ -115,7 +98,7 @@
               
                 echo("<p>SUCCESS: Test added successfully!</p>");                    
                 
-                mysql_close($connection);
+                $connection = NULL;
             }
         ?>
     </body>
