@@ -84,7 +84,7 @@
                         echo("</table>");
                     }
                 } else {
-                    echo("<p>$animal_name hasn't had any prescriptions in the clinic.</p>");
+                    echo("<p>$animal_name doesn't have any prescriptions in the clinic.</p>");
                 }
 
                 $connection = NULL;
