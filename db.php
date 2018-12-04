@@ -1,8 +1,8 @@
 <?php
     // muda-se para a db que quiserem.
     $hostname = "db.tecnico.ulisboa.pt";
-    $username= "ist425422";
-    $password = "ehhn4994";
+    $username= "ist181570";
+    $password = "eeua4108";
 
     $dsn = "mysql:host=$hostname;dbname=$username";
 

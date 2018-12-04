@@ -43,7 +43,7 @@
 
                 // Database access
                 $connection = require_once('db.php');
-                $query_str = "INSERT INTO consult VALUES (:name, :vat_owner, :consultdate, :s, :o, :a, :p, :vat_client, :vat_vet, :weigth)";
+                $query_str = "INSERT INTO consult (name , VAT_owner , date_timestamp , s , o , a , p , VAT_client , VAT_vet , weight) VALUES (:name, :vat_owner, :consultdate, :s, :o, :a, :p, :vat_client, :vat_vet, :weigth)";
                 $stmt = $connection->prepare($query_str);
                 
                 $stmt->bindParam(':name', $_SESSION['animal_name']);

@@ -71,7 +71,7 @@
                     exit();
                 }
                 
-
+                echo("<p>-------------------------------------------------------------------</p>");
                 echo("<h4>Prescriptions of the animal:</h4>");
 
                 if ($stmt2->rowCount() > 0 ) {
@@ -82,6 +82,7 @@
                         echo("<p><b>Lab:</b> ".$result['lab']."</p>");
                         echo("<p><b>Dosage:</b> ".$result['dosage']."</p>");
                         echo("</table>");
+                        echo("<p>-------------------------------------------------------------------</p>");
                     }
                 } else {
                     echo("<p>$animal_name doesn't have any prescriptions in the clinic.</p>");
