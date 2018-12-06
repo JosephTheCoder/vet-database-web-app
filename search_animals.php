@@ -32,7 +32,8 @@
     
                 // Database access
                 $connection = require_once('db.php');
-                $query_str = "SELECT DISTINCT person.name as person_name, animal.name as animal_name, animal.species_name, animal.age, animal.VAT as animal_vat FROM person, client, animal, consult WHERE (animal.name = :animal_name AND person.name LIKE :client_name AND person.VAT = client.VAT AND client.VAT = animal.VAT AND consult.VAT_owner = client.VAT AND consult.name = animal.name) OR (animal.name = :animal_name AND client.VAT = :client_vat AND client.VAT = consult.VAT_client AND consult.name = animal.name AND person.VAT = consult.VAT_owner)";
+                $query_str = "SELECT DISTINCT person.name as person_name, animal.name as animal_name, animal.species_name, animal.age, animal.VAT as animal_vat FROM person, client, animal, consult WHERE animal.name = :animal_name AND person.name LIKE :client_name AND person.VAT = client.VAT AND client.VAT = animal.VAT AND consult.VAT_owner = client.VAT AND consult.name = animal.name AND consult.VAT_client = :client_vat";
+                // $query_str = "SELECT DISTINCT person.name as person_name, animal.name as animal_name, animal.species_name, animal.age, animal.VAT as animal_vat FROM person, client, animal, consult WHERE (animal.name = :animal_name AND person.name LIKE :client_name AND person.VAT = client.VAT AND client.VAT = animal.VAT AND consult.VAT_owner = client.VAT AND consult.name = animal.name) OR (animal.name = :animal_name AND client.VAT = :client_vat AND client.VAT = consult.VAT_client AND consult.name = animal.name AND person.VAT = consult.VAT_owner)";
                 $stmt = $connection->prepare($query_str);
 
                 $clnt_name = '%'.$client_name.'%';

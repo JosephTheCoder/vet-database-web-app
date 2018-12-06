@@ -6,11 +6,11 @@
             <table>
                 <tr>
                     <td align='right'>Client VAT:</td>
-                    <td><input type="text" name="animal_vat"></td>
+                    <td><input type="text" name="animal_vat" value="<?php echo htmlspecialchars($client_vat); ?>"></td>
                 </tr>
                 <tr>
                     <td align='right'>Name:</td>
-                    <td><input type="text" name="animal_name"></td>
+                    <td><input type="text" name="animal_name" value="<?php echo htmlspecialchars($animal_name); ?>"></td>
                 </tr>                
                 <tr>
                     <td align='right'>Species name:</td>
@@ -22,7 +22,9 @@
                 </tr>
                 <tr>
                     <td align='right'>Gender:</td>
-                    <td><input type="text" name="animal_gender"></td>
+                    <td><select name="animal_gender">
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option></td>
                 </tr>
                 <tr>
                     <td align='right'>Birth date:</td>

@@ -46,6 +46,11 @@
                 
                 if ( !$stmt->execute() ) {
                     echo("<p>An error occurred! The animal was not added!</p>");
+
+                    if ($stmt->errorInfo()[0] == "23000"){
+                        echo("<p>The owner's VAT that is being used doesn't exist in the database!</p>");
+                    }
+                    
                     exit();
                 }
               
