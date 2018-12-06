@@ -96,13 +96,53 @@
                     $stmt->bindParam(':num', $num);
 
                     if ( !$stmt->execute() ) {
-                        echo("<p>An error occurred! The test was not added!</p>");
+                        echo("<p>An error occurred! The glicose indicator was not added!</p>");
                         exit();
                     }
-                    $stmt->close();          
+                    //$stmt->close();          
                 }
                 
-                // MISSING a query for each other produced indicator
+                if(!empty($_REQUEST['mp_result'])){
+
+                    $mp_result = strip_tags($_REQUEST['mp_result'],"<b><i><a><p>");
+                    $mp_result = htmlspecialchars($mp_result);
+                    
+                    $query_str = "INSERT INTO produced_indicator (name, VAT_owner, date_timestamp, num, indicator_name, value) VALUES (:anmal_name, :ownvat, :datestamp, :num, 'magic power', :value_mp)";
+                    $stmt2 = $connection->prepare($query_str);
+
+                    $stmt2->bindParam(':anmal_name', $_SESSION['animal_name']);
+                    $stmt2->bindParam(':datestamp', $_SESSION['date']);
+                    $stmt2->bindParam(':value_mp', $mp_result);
+                    $stmt2->bindParam(':ownvat', $_SESSION['animal_vat']);
+                    $stmt2->bindParam(':num', $num);
+
+                    if ( !$stmt2->execute() ) {
+                        echo("<p>An error occurred! The magic power indicator was not added!</p>");
+                        exit();
+                    }
+                    //$stmt->close();          
+                }
+                
+                if(!empty($_REQUEST['mp_result'])){
+
+                    $cl_result = strip_tags($_REQUEST['cl_result'],"<b><i><a><p>");
+                    $cl_result = htmlspecialchars($cl_result);
+                    
+                    $query_str = "INSERT INTO produced_indicator (name, VAT_owner, date_timestamp, num, indicator_name, value) VALUES (:anmal_name, :ownvat, :datestamp, :num, 'creatinine level', :value_cl)";
+                    $stmt3 = $connection->prepare($query_str);
+
+                    $stmt3->bindParam(':anmal_name', $_SESSION['animal_name']);
+                    $stmt3->bindParam(':datestamp', $_SESSION['date']);
+                    $stmt3->bindParam(':value_cl', $cl_result);
+                    $stmt3->bindParam(':ownvat', $_SESSION['animal_vat']);
+                    $stmt3->bindParam(':num', $num);
+
+                    if ( !$stmt3->execute() ) {
+                        echo("<p>An error occurred! The magic power indicator was not added!</p>");
+                        exit();
+                    }
+                    //$stmt->close();          
+                }
               
                 echo("<p>SUCCESS: Test added successfully!</p>");                    
                 
