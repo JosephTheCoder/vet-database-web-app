@@ -26,7 +26,7 @@
     
                 // Database access
                 $connection = require_once('db.php');
-                $sql = "SELECT DISTINCT person.name as person_name, animal.name as animal_name, animal.species_name, animal.age, animal.VAT as animal_vat FROM person, client, animal, consult WHERE animal.name = :animal_name AND person.name LIKE :client_name AND person.VAT = client.VAT AND client.VAT = animal.VAT AND consult.VAT_owner = client.VAT AND consult.name = animal.name AND consult.VAT_client = :client_vat";
+                $sql = "SELECT DISTINCT person.name as person_name, animal.name as animal_name, animal.species_name, animal.age, animal.VAT as animal_vat FROM person, client, animal, consult WHERE (animal.name = :animal_name AND person.name LIKE :client_name AND person.VAT = client.VAT AND client.VAT = animal.VAT AND consult.VAT_owner = client.VAT AND consult.name = animal.name AND consult.VAT_client = :client_vat) OR (animal.name = :animal_name AND person.name LIKE :client_name AND person.VAT = client.VAT AND client.VAT = animal.VAT AND animal.VAT = :client_vat)";
                 $stmt = $connection->prepare($sql);
 
                 $clnt_name = '%'.$client_name.'%';
