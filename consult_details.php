@@ -65,7 +65,7 @@
                 // PRESCRIPTION QUERIES
                 $sql = "SELECT consult_diagnosis.code, prescription.name_med, prescription.lab, prescription.dosage FROM consult LEFT JOIN consult_diagnosis ON (consult.VAT_owner = consult_diagnosis.VAT_owner AND consult.date_timestamp = consult_diagnosis.date_timestamp AND consult_diagnosis.name = consult.name) LEFT JOIN prescription ON (prescription.date_timestamp = consult_diagnosis.date_timestamp AND prescription.name = consult_diagnosis.name AND prescription.VAT_owner = consult_diagnosis.VAT_owner AND prescription.code = consult_diagnosis.code) WHERE consult.date_timestamp = :date_timestamp AND consult.name = :animal_name";
 
-                $stmt = $connection->prepare($query_prescriptions);
+                $stmt = $connection->prepare($sql);
 
                 $stmt->bindParam(':date_timestamp', $date_timestamp);
                 $stmt->bindParam(':animal_name', $_SESSION['animal_name']);
