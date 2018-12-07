@@ -106,11 +106,6 @@ the reporting units should be changed from milligrams to centigrams, and
 the reference values (as well as the measured values for all procedures
 considering this indicator) should be changed by dividing them by 10.*/
 
--- not sure, mas acho que faz o pedido.
-/* tentei fazer num so update (tendo as duas condições dos wheres que existem
-agora com a junção lógica OR) mas desta forma dava update também a rows que
-não tinham o nome igual no produced_indicator (ou seja lixava todos os valores
-miligramas ou não) resolvi deixar em dois updates! any other ideas?*/
 DELIMITER $$
 
 CREATE PROCEDURE change_mg2cg()
