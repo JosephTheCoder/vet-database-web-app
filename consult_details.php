@@ -22,7 +22,7 @@
                 $animal_name = $_SESSION['animal_name'];
 
                 // Database access
-                $connection = require_once('db.php'); // FALTA PASSAR O OWNER VAT PARA VERIFICAR NO FIM DA QUERY
+                $connection = require_once('db.php');
                 $sql = "SELECT  animal.gender, animal.age, consult.weight, animal.species_name, animal.colour, consult.VAT_owner, consult.s, consult.o, consult.a, consult.p FROM consult, animal WHERE consult.VAT_owner = animal.VAT AND consult.name = animal.name AND consult.date_timestamp = :date_timestamp AND consult.name = :animal_name AND consult.VAT_owner = :animal_vat";
                 
                 $stmt = $connection->prepare($sql);
