@@ -25,7 +25,7 @@
                 $_SESSION['animal_name'] = $animal_name;
 
                 // Database access
-                $connection = require_once('db.php'); //TODO query
+                $connection = require_once('db.php');
                 $sql = "SELECT consult.date_timestamp, consult.VAT_client, consult.VAT_vet FROM consult WHERE consult.name = :animal_name AND consult.VAT_owner = :animal_vat";
                 $stmt = $connection->prepare($sql);
 
