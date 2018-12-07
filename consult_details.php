@@ -70,23 +70,25 @@
                 $stmt->bindParam(':date_timestamp', $date_timestamp);
                 $stmt->bindParam(':animal_name', $_SESSION['animal_name']);
 
-                if ( $stmt->execute() ) {
-                    echo("<p>-------------------------------------------------------------------</p>");
-                    echo("<h4>Prescriptions of the animal:</h4>");
+                if ( !$stmt->execute() ) {
+                    echo("<p>An error occurred!</p>");
+                    $connection = NULL;
+                    exit();
+                }
 
-                    if ($stmt->rowCount() > 0 ) {
-                        foreach ($stmt as $result) {
-                            echo("<p><b>Diagnositc code:</b> ".$result['code']."</p>");
-                            echo("<p><b>Med:</b> ".$result['name_med']."</p>");
-                            echo("<p><b>Lab:</b> ".$result['lab']."</p>");
-                            echo("<p><b>Dosage:</b> ".$result['dosage']."</p>");
-                            echo("</table>");
-                            echo("<p>-------------------------------------------------------------------</p>");
-                        }
+                echo("<p>-------------------------------------------------------------------</p>");
+                echo("<h4>Prescriptions of the animal:</h4>");
+
+                if ($stmt->rowCount() > 0 ) {
+                    foreach ($stmt as $result) {
+                        echo("<p><b>Diagnositc code:</b> ".$result['code']."</p>");
+                        echo("<p><b>Med:</b> ".$result['name_med']."</p>");
+                        echo("<p><b>Lab:</b> ".$result['lab']."</p>");
+                        echo("<p><b>Dosage:</b> ".$result['dosage']."</p>");
+                        echo("</table>");
+                        echo("<p>-------------------------------------------------------------------</p>");
                     }
-                } 
-                 
-                else {
+                } else {
                     echo("<p>$animal_name doesn't have any prescriptions in the clinic.</p>");
                 }
 

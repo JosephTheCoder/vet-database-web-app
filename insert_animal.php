@@ -47,9 +47,9 @@
                 
                 if ( !$stmt->execute() ) {
                     echo("<p>An error occurred! The animal was not added!</p>");
-
+                    print_r($stmt->errorInfo());
                     if ($stmt->errorInfo()[0] == "23000"){
-                        echo("<p>The owner's VAT is either non existant or has an animal with the same name.</p>");
+                        echo("<p>The owner's VAT is non existant</p>");
                     }
                     
                     $connection = NULL;
