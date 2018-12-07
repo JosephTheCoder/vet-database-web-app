@@ -1,9 +1,6 @@
 <?php
-    // We start a session in order to safe the search parameters.
     session_start();
 ?>
-
-<!-- TOTALLY INCOMPLETE!! YET TO TEST -->
 
 <!DOCTYPE html>
 <html>
@@ -12,139 +9,164 @@
     </head>
     <body>
         <?php
-            if ( empty($_SESSION['animal_name']) || empty($_SESSION['animal_vat']) || empty($_SESSION['date']) || empty($_REQUEST['ass_vat'])) {
+            if ( empty($_SESSION['animal_name']) || empty($_SESSION['animal_vat']) || empty($_SESSION['date']) || empty($_REQUEST['assistant_vat'])) {
                 // Invalid request / user directly opened file.
-                echo("<p>ERROR: not enough info!</p>");
+                echo("<p>ERROR: New blood test info is incomplete!</p>");
+                echo("<a href=\"javascript:history.go(-1)\"><button><- Back</button></a>");
             } else {
                 // Request with all required parameters was made
-                $ass_vat = strip_tags($_REQUEST['ass_vat'],"<b><i><a><p>");
-                $ass_vat = htmlspecialchars($ass_vat);       
+                $assistant_vat = strip_tags($_REQUEST['assistant_vat'],"<b><i><a><p>");
+                $assistant_vat = htmlspecialchars($assistant_vat);       
 
                 // Database access
                 $connection = require_once('db.php');
 
                 // which num is the procedure
-                $search_num = "SELECT MAX(num) as nr FROM `procedure` WHERE name = :anmal_name AND VAT_owner = :ownvat ";
-                $finder = $connection->prepare($search_num);                
-                $finder->bindParam(':ownvat', $_SESSION['animal_vat']);
-                $finder->bindParam(':anmal_name', $_SESSION['animal_name']);
-                if ( !$finder->execute() ) {
-                    echo("<p>An error occurred! finder</p>");
+                $sql = "SELECT MAX(num) as nr FROM `procedure` WHERE name = :anmal_name AND VAT_owner = :ownvat ";
+                $stmt = $connection->prepare($sql);                
+                $stmt->bindParam(':ownvat', $_SESSION['animal_vat']);
+                $stmt->bindParam(':anmal_name', $_SESSION['animal_name']);
+
+                if ( !$stmt->execute() ) {
+                    echo("<p>An error while accessing the existing procedures</p>");
+                    echo("<a href=\"javascript:history.go(-1)\"><button><- Back</button></a>");
+                    $connection = NULL;
                     exit();
                 }
-                $result = $finder->fetch();
-                $num = $result['nr'] + 1;
 
-                echo("<p>Procedure num ".$num."</p>");
-                //$finder->close();
+                $result = $stmt->fetch();
+                $num = $result['nr'] + 1;
+                
+                $connection->beginTransaction();  // begin the database transaction
                 
                 // create a procedure!! (& test procedure)
-                $insert_pro = "INSERT INTO `procedure` (name, VAT_owner, date_timestamp, num, description) VALUES (:anmal_name, :ownvat, :datestamp, :num, 'blood test with some indicators')";
-                $inspro = $connection->prepare($insert_pro);
-                $inspro->bindParam(':anmal_name', $_SESSION['animal_name']);
-                $inspro->bindParam(':datestamp', $_SESSION['date']);
-                $inspro->bindParam(':ownvat', $_SESSION['animal_vat']);
-                $inspro->bindParam(':num', $num);
-                if ( !$inspro->execute() ) {
+                $sql = "INSERT INTO `procedure` (name, VAT_owner, date_timestamp, num, description) VALUES (:anmal_name, :ownvat, :datestamp, :num, 'blood test with some indicators')";
+                $stmt = $connection->prepare($sql);
+                $stmt->bindParam(':anmal_name', $_SESSION['animal_name']);
+                $stmt->bindParam(':datestamp', $_SESSION['date']);
+                $stmt->bindParam(':ownvat', $_SESSION['animal_vat']);
+                $stmt->bindParam(':num', $num);
+
+                if ( !$stmt->execute() ) {
                     echo("<p>An error occurred! The procedure was not added!</p>");
+                    echo("<a href=\"javascript:history.go(-1)\"><button><- Back</button></a>");
+                    $connection = NULL;
                     exit();
                 }
-                echo("<p> inserted procedure </p>");
-                //$inspro->close();
                 
-                $insert_tp = "INSERT INTO test_procedure (name, VAT_owner, date_timestamp, num, type) VALUES (:anmal_name, :ownvat, :datestamp, :num, 'blood')";
-                $instp = $connection->prepare($insert_tp);
-                $instp->bindParam(':anmal_name', $_SESSION['animal_name']);
-                $instp->bindParam(':datestamp', $_SESSION['date']);
-                $instp->bindParam(':ownvat', $_SESSION['animal_vat']);
-                $instp->bindParam(':num', $num);
-                if ( !$instp->execute() ) {
+                $sql = "INSERT INTO test_procedure (name, VAT_owner, date_timestamp, num, type) VALUES (:anmal_name, :ownvat, :datestamp, :num, 'blood')";
+                $stmt = $connection->prepare($sql);
+                $stmt->bindParam(':anmal_name', $_SESSION['animal_name']);
+                $stmt->bindParam(':datestamp', $_SESSION['date']);
+                $stmt->bindParam(':ownvat', $_SESSION['animal_vat']);
+                $stmt->bindParam(':num', $num);
+
+                if ( !$stmt->execute() ) {
                     echo("<p>An error occurred! The test procedure was not added!</p>");
+                    echo("<a href=\"javascript:history.go(-1)\"><button><- Back</button></a>");
+                    $connection->rollback();
+                    $connection = NULL;
                     exit();
                 }
-                echo("<p> inserted test procedure </p>");
-                //$instp->close();
                 
                 // preformed by                
-                $insert_pre = "INSERT INTO performed (name, VAT_owner, date_timestamp, num, VAT_assistant) VALUES (:anmal_name, :ownvat, :datestamp, :num, :assvat)";
-                $inspre = $connection->prepare($insert_pre);
-                $inspre->bindParam(':anmal_name', $_SESSION['animal_name']);
-                $inspre->bindParam(':datestamp', $_SESSION['date']);
-                $inspre->bindParam(':ownvat', $_SESSION['animal_vat']);
-                $inspre->bindParam(':num', $num);
-                $inspre->bindParam(':assvat', $ass_vat);
-                if ( !$inspre->execute() ) {
-                    echo("<p>An error occurred! The performed was not added!</p>");
+                $sql = "INSERT INTO performed (name, VAT_owner, date_timestamp, num, VAT_assistant) VALUES (:anmal_name, :ownvat, :datestamp, :num, :assvat)";
+                $stmt = $connection->prepare($sql);
+                $stmt->bindParam(':anmal_name', $_SESSION['animal_name']);
+                $stmt->bindParam(':datestamp', $_SESSION['date']);
+                $stmt->bindParam(':ownvat', $_SESSION['animal_vat']);
+                $stmt->bindParam(':num', $num);
+                $stmt->bindParam(':assvat', $assistant_vat);
+
+                if ( !$stmt->execute() ) {
+                    echo("<p>An error occurred! The procedure was not added!</p>");
+
+                    if ($stmt->errorInfo()[0] == "23000"){
+                        echo("<p>The assistant's VAT is non existant.</p>");
+                    }
+                    
+                    echo("<a href=\"javascript:history.go(-1)\"><button><- Back</button></a>");
+                    $connection->rollback();
+                    $connection = NULL;
                     exit();
                 }
-                echo("<p> inserted preformed </p>");
-                //$inspre->close();
-                
-                // insert into produced indicator query
-                if(!empty($_REQUEST['glic_result'])){
 
-                    $glic_result = strip_tags($_REQUEST['glic_result'],"<b><i><a><p>");
-                    $glic_result = htmlspecialchars($glic_result);
+                // Insert each one of the procedures, starting with the magic_power
+                if(!empty($_REQUEST['magic_power'])){
+
+                    $magic_power = strip_tags($_REQUEST['magic_power'],"<b><i><a><p>");
+                    $magic_power = htmlspecialchars($magic_power);
                     
-                    $query_str = "INSERT INTO produced_indicator (name, VAT_owner, date_timestamp, num, indicator_name, value) VALUES (:anmal_name, :ownvat, :datestamp, :num, 'glicose', :value_gli)";
-                    $stmt = $connection->prepare($query_str);
+                    $sql = "INSERT INTO produced_indicator (name, VAT_owner, date_timestamp, num, indicator_name, value) VALUES (:anmal_name, :ownvat, :datestamp, :num, 'magic power', :value_ind)";
+                    $stmt = $connection->prepare($sql);
 
                     $stmt->bindParam(':anmal_name', $_SESSION['animal_name']);
                     $stmt->bindParam(':datestamp', $_SESSION['date']);
-                    $stmt->bindParam(':value_gli', $glic_result);
+                    $stmt->bindParam(':value_ind', $magic_power);
                     $stmt->bindParam(':ownvat', $_SESSION['animal_vat']);
                     $stmt->bindParam(':num', $num);
 
                     if ( !$stmt->execute() ) {
-                        echo("<p>An error occurred! The glicose indicator was not added!</p>");
+                        echo("<p>An error occurred! The magic power indicator was not added, the procedure was deleted!</p>");
+                        echo("<a href=\"javascript:history.go(-1)\"><button><- Back</button></a>");
+                        $connection->rollback();
+                        $connection = NULL;
                         exit();
-                    }
-                    //$stmt->close();          
+                    }     
                 }
                 
-                if(!empty($_REQUEST['mp_result'])){
+                // Insert glicose results indicator
+                if(!empty($_REQUEST['glicose'])){
 
-                    $mp_result = strip_tags($_REQUEST['mp_result'],"<b><i><a><p>");
-                    $mp_result = htmlspecialchars($mp_result);
+                    $glicose = strip_tags($_REQUEST['glicose'],"<b><i><a><p>");
+                    $glicose = htmlspecialchars($glicose);
                     
-                    $query_str = "INSERT INTO produced_indicator (name, VAT_owner, date_timestamp, num, indicator_name, value) VALUES (:anmal_name, :ownvat, :datestamp, :num, 'magic power', :value_mp)";
-                    $stmt2 = $connection->prepare($query_str);
+                    $sql = "INSERT INTO produced_indicator (name, VAT_owner, date_timestamp, num, indicator_name, value) VALUES (:anmal_name, :ownvat, :datestamp, :num, 'glicose', :value_ind)";
+                    $stmt = $connection->prepare($sql);
 
-                    $stmt2->bindParam(':anmal_name', $_SESSION['animal_name']);
-                    $stmt2->bindParam(':datestamp', $_SESSION['date']);
-                    $stmt2->bindParam(':value_mp', $mp_result);
-                    $stmt2->bindParam(':ownvat', $_SESSION['animal_vat']);
-                    $stmt2->bindParam(':num', $num);
+                    $stmt->bindParam(':anmal_name', $_SESSION['animal_name']);
+                    $stmt->bindParam(':datestamp', $_SESSION['date']);
+                    $stmt->bindParam(':value_ind', $glicose);
+                    $stmt->bindParam(':ownvat', $_SESSION['animal_vat']);
+                    $stmt->bindParam(':num', $num);
 
-                    if ( !$stmt2->execute() ) {
-                        echo("<p>An error occurred! The magic power indicator was not added!</p>");
+                    if ( !$stmt->execute() ) {
+                        echo("<p>An error occurred! The glicose indicator was not added, the procedure was deleted!</p>");
+                        echo("<a href=\"javascript:history.go(-1)\"><button><- Back</button></a>");
+                        $connection->rollback();
+                        $connection = NULL;
                         exit();
                     }
-                    //$stmt->close();          
                 }
                 
-                if(!empty($_REQUEST['mp_result'])){
 
-                    $cl_result = strip_tags($_REQUEST['cl_result'],"<b><i><a><p>");
-                    $cl_result = htmlspecialchars($cl_result);
+                // Insert creatinine results indicator
+                if(!empty($_REQUEST['creatinine'])){
+
+                    $creatinine = strip_tags($_REQUEST['creatinine'],"<b><i><a><p>");
+                    $creatinine = htmlspecialchars($creatinine);
                     
-                    $query_str = "INSERT INTO produced_indicator (name, VAT_owner, date_timestamp, num, indicator_name, value) VALUES (:anmal_name, :ownvat, :datestamp, :num, 'creatinine level', :value_cl)";
-                    $stmt3 = $connection->prepare($query_str);
+                    $sql = "INSERT INTO produced_indicator (name, VAT_owner, date_timestamp, num, indicator_name, value) VALUES (:anmal_name, :ownvat, :datestamp, :num, 'creatinine level', :value_ind)";
+                    $stmt = $connection->prepare($sql);
 
-                    $stmt3->bindParam(':anmal_name', $_SESSION['animal_name']);
-                    $stmt3->bindParam(':datestamp', $_SESSION['date']);
-                    $stmt3->bindParam(':value_cl', $cl_result);
-                    $stmt3->bindParam(':ownvat', $_SESSION['animal_vat']);
-                    $stmt3->bindParam(':num', $num);
+                    $stmt->bindParam(':anmal_name', $_SESSION['animal_name']);
+                    $stmt->bindParam(':datestamp', $_SESSION['date']);
+                    $stmt->bindParam(':value_ind', $creatinine);
+                    $stmt->bindParam(':ownvat', $_SESSION['animal_vat']);
+                    $stmt->bindParam(':num', $num);
 
-                    if ( !$stmt3->execute() ) {
-                        echo("<p>An error occurred! The magic power indicator was not added!</p>");
+                    if ( !$stmt->execute() ) {
+                        echo("<p>An error occurred! The creatinine indicator was not added, the procedure was deleted!</p>");
+                        echo("<a href=\"javascript:history.go(-1)\"><button><- Back</button></a>");
+                        $connection->rollback();
+                        $connection = NULL;
                         exit();
-                    }
-                    //$stmt->close();          
+                    }     
                 }
-              
-                echo("<p>SUCCESS: Test added successfully!</p>");                    
+                
+                
+                $connection->commit();
+                echo("<p>The blood test was added successfully!</p>");                    
                 
                 $connection = NULL;
             }

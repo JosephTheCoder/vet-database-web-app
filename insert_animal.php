@@ -7,7 +7,8 @@
         <?php
             if ( empty($_REQUEST['animal_vat']) || empty($_REQUEST['animal_name']) || empty($_REQUEST['animal_species']) || empty($_REQUEST['animal_colour']) || empty($_REQUEST['animal_gender']) || empty($_REQUEST['animal_birth'])) {
                 // Invalid request / user directly opened file.
-                echo("<p>ERROR: Animal info must be provided on the request!</p>");
+                echo("<p>ERROR: New animal info is incomplete!</p>");
+                echo("<a href=\"javascript:history.go(-1)\"><button><- Back</button></a>");
             } else {
                 // Request with all required parameters was made
                 $animal_vat = strip_tags($_REQUEST['animal_vat'],"<b><i><a><p>");
@@ -30,8 +31,8 @@
 
                 // Database access
                 $connection = require_once('db.php');
-                $query_str = "INSERT INTO animal (name, VAT, species_name, colour, gender, birth_year, age) VALUES (:name, :vat, :species, :colour, :gender, :birth, :age)";
-                $stmt = $connection->prepare($query_str);
+                $sql = "INSERT INTO animal (name, VAT, species_name, colour, gender, birth_year, age) VALUES (:name, :vat, :species, :colour, :gender, :birth, :age)";
+                $stmt = $connection->prepare($sql);
                 
                 $stmt->bindParam(':name', $animal_name);
                 $stmt->bindParam(':vat', $animal_vat);
@@ -51,6 +52,7 @@
                         echo("<p>The owner's VAT is either non existant or has an animal with the same name.</p>");
                     }
                     
+                    $connection = NULL;
                     exit();
                 }
               
@@ -66,7 +68,6 @@
                 echo("</table>");                    
         
                 // Close connection
-                $stmt->close();
                 $connection = NULL;
             }
         ?>

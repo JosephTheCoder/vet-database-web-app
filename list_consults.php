@@ -26,19 +26,21 @@
 
                 // Database access
                 $connection = require_once('db.php'); //TODO query
-                $query_str = "SELECT consult.date_timestamp, consult.VAT_client, consult.VAT_vet FROM consult WHERE consult.name = :animal_name AND consult.VAT_owner = :animal_vat";
-                $stmt = $connection->prepare($query_str);
+                $sql = "SELECT consult.date_timestamp, consult.VAT_client, consult.VAT_vet FROM consult WHERE consult.name = :animal_name AND consult.VAT_owner = :animal_vat";
+                $stmt = $connection->prepare($sql);
 
                 $stmt->bindParam(':animal_name', $animal_name);
                 $stmt->bindParam(':animal_vat', $animal_vat);
 
                 if ( !$stmt->execute() ) {
                     echo("<p>An error occurred!</p>");
+                    $connection = NULL;
                     exit();
                 }
                 
                 echo("<p>-------------------------------------------------------------------</p>");
                 echo("<p><h2>$animal_name Consult Dashboard</h2><p>");
+                echo("<a href=\"javascript:history.go(-1)\"><button><- Back</button></a>");
                 echo("<p>-------------------------------------------------------------------</p>");
 
                 echo("<h3>List of consults</h3>");
@@ -57,7 +59,6 @@
                     echo("<p>$animal_name hasn't had any consults in the clinic.</p>");
                 }
 
-                $stmt->close();
                 $connection = NULL;
             }
         ?>

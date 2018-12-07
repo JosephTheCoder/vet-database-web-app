@@ -1,5 +1,4 @@
 <?php
-    // We start a session in order to safe the search parameters.
     session_start();
 ?>
 
@@ -12,7 +11,8 @@
         <?php //basically copied from insert_animal.php
             if ( empty($_REQUEST['consult_vat_cli']) || empty($_REQUEST['consult_vat_vet']) || empty($_SESSION['animal_name']) || empty($_SESSION['animal_vat'])) {
                 // Invalid request / user directly opened file.
-                echo("<p>ERROR: Consult info must be provided on the request!</p>");
+                echo("<p>ERROR: New consult info is incomplete!</p>");
+                echo("<a href=\"javascript:history.go(-1)\"><button><- Back</button></a>");
             } else {
                 // Request with all required parameters was made
                 $vat_vet = strip_tags($_REQUEST['consult_vat_vet'],"<b><i><a><p>");
@@ -43,8 +43,8 @@
 
                 // Database access
                 $connection = require_once('db.php');
-                $query_str = "INSERT INTO consult (name , VAT_owner , date_timestamp , s , o , a , p , VAT_client , VAT_vet , weight) VALUES (:name, :vat_owner, :consultdate, :s, :o, :a, :p, :vat_client, :vat_vet, :weigth)";
-                $stmt = $connection->prepare($query_str);
+                $sql = "INSERT INTO consult (name , VAT_owner , date_timestamp , s , o , a , p , VAT_client , VAT_vet , weight) VALUES (:name, :vat_owner, :consultdate, :s, :o, :a, :p, :vat_client, :vat_vet, :weigth)";
+                $stmt = $connection->prepare($sql);
                 
                 $stmt->bindParam(':name', $_SESSION['animal_name']);
                 $stmt->bindParam(':vat_owner', $_SESSION['animal_vat']);
@@ -63,23 +63,25 @@
                     exit();
                 }
               
-                echo("<p>SUCCESS: Consult added successfully!</p>");
+                echo("<p>The consult was added successfully!</p>");
 
+                if ($diagnostic_codes !== '') {
+                    $sql = "INSERT INTO consult_diagnosis VALUES (:code, :name, :vat_owner, :consultdate)";
+                    $stmt = $connection->prepare($sql);
 
-                $query2 = "INSERT INTO consult_diagnosis VALUES (:code, :name, :vat_owner, :consultdate)";
-                $stmt2 = $connection->prepare($query2);
+                    $stmt->bindParam(':code', $diagnostic_codes);                
+                    $stmt->bindParam(':name', $_SESSION['animal_name']);
+                    $stmt->bindParam(':vat_owner', $_SESSION['animal_vat']);
+                    $stmt->bindParam(':consultdate', $date_timestamp);
 
-                $stmt2->bindParam(':code', $diagnostic_codes);                
-                $stmt2->bindParam(':name', $_SESSION['animal_name']);
-                $stmt2->bindParam(':vat_owner', $_SESSION['animal_vat']);
-                $stmt2->bindParam(':consultdate', $date_timestamp);
-
-                if ( !$stmt2->execute() ) {
-                    echo("<p>An error occurred! The diagnosis was not added!</p>");
-                    exit();
+                    if ( !$stmt->execute() ) {
+                        echo("<p>An error occurred! The diagnosis was not added!</p>");
+                        $connection = NULL;
+                        exit();
+                    }
+                
+                    echo("<p>The diagnosis was added successfully!</p>");
                 }
-              
-                echo("<p>SUCCESS: Diagnosis added successfully!</p>");
 
                 // Close connection
                 $connection = NULL;

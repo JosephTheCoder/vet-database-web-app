@@ -5,17 +5,11 @@
     </head>
 
     <body>        
-        <?php
-            if (empty($_REQUEST['animal_name'])) {
+        <?php            
+            if (empty($_REQUEST['client_vat']) || empty($_REQUEST['client_name']) || empty($_REQUEST['animal_name'])) {
                 // Invalid request
-                echo("<p>Invalid Search parameters. Please always include a animal name and either a client vat or name</p>");
-                include('index.php');
-            } 
-            
-            elseif (empty($_REQUEST['client_vat']) && empty($_REQUEST['client_name'])) {
-                // Invalid request
-                echo("<p>Invalid Search parameters. Please always include a animal name and either a client vat or name</p>");
-                include('index.php');
+                echo("<p>Invalid Search parameters. Please always include a animal name, a client vat and name</p>");
+                echo("<a href=\"javascript:history.go(-1)\"><button>GO BACK</button></a>");
             } 
             
             else {    
@@ -32,9 +26,8 @@
     
                 // Database access
                 $connection = require_once('db.php');
-                $query_str = "SELECT DISTINCT person.name as person_name, animal.name as animal_name, animal.species_name, animal.age, animal.VAT as animal_vat FROM person, client, animal, consult WHERE animal.name = :animal_name AND person.name LIKE :client_name AND person.VAT = client.VAT AND client.VAT = animal.VAT AND consult.VAT_owner = client.VAT AND consult.name = animal.name AND consult.VAT_client = :client_vat";
-                // $query_str = "SELECT DISTINCT person.name as person_name, animal.name as animal_name, animal.species_name, animal.age, animal.VAT as animal_vat FROM person, client, animal, consult WHERE (animal.name = :animal_name AND person.name LIKE :client_name AND person.VAT = client.VAT AND client.VAT = animal.VAT AND consult.VAT_owner = client.VAT AND consult.name = animal.name) OR (animal.name = :animal_name AND client.VAT = :client_vat AND client.VAT = consult.VAT_client AND consult.name = animal.name AND person.VAT = consult.VAT_owner)";
-                $stmt = $connection->prepare($query_str);
+                $sql = "SELECT DISTINCT person.name as person_name, animal.name as animal_name, animal.species_name, animal.age, animal.VAT as animal_vat FROM person, client, animal, consult WHERE animal.name = :animal_name AND person.name LIKE :client_name AND person.VAT = client.VAT AND client.VAT = animal.VAT AND consult.VAT_owner = client.VAT AND consult.name = animal.name AND consult.VAT_client = :client_vat";
+                $stmt = $connection->prepare($sql);
 
                 $clnt_name = '%'.$client_name.'%';
 
@@ -44,11 +37,13 @@
 
                 if ( !$stmt->execute() ) {
                     echo("<p>An error occurred!</p>");
+                    $connection = NULL;
                     exit();
                 }
 
                 echo("<p>-------------------------------------------------------------------</p>");
                 echo("<h2>Search results</h2>");
+                echo("<a href=\"javascript:history.go(-1)\"><button><- Back</button></a>");
                 echo("<p>-------------------------------------------------------------------</p>");
                 
                 echo("<h4>Search Parameters:</h4><p><b>Client VAT:</b> $client_vat</p><p><b>Client name:</b> $client_name</p><p><b>Animal name:</b> $animal_name</p>");
@@ -68,8 +63,7 @@
                     echo("<p>-------------------------------------------------------------------</p>");
                     include('new_animal.php');
                 }
-
-                $stmt->close();
+                
                 $connection = NULL;
             }
         ?>
